@@ -1,67 +1,45 @@
-#include "MenuScene.h"
-#include "MainScene.h"
+#include "Ball.h"
 #include "Definitions.h"
 
 USING_NS_CC;
+using namespace cocos2d;
 
-#include "extensions/cocos-ext.h"
-#include "ui/CocosGUI.h"
-
-USING_NS_CC_EXT;
-using namespace ui;
-
-Scene* MenuScene::createScene()
+Ball::Ball()
 {
-	auto scene = Scene::create();
-	auto layer = MenuScene::create();
 
-	scene->addChild(layer);
-
-    return scene;
 }
 
-bool MenuScene::init()
+Ball::~Ball()
 {
-    if ( !Scene::init() )
-    {
-        return false;
-    }
 
-	auto bg = cocos2d::LayerColor::create(Color4B(255, 255, 255, 255));
-	this->addChild(bg);
-
-	MenuManager();
-
-    return true;
 }
 
-void MenuScene::MenuManager() 
+Ball * Ball::create()
 {
-	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Ball* ball = NULL;
+	ball = new Ball();
+
+	if (ball && ball->initWithFile(BALL))
+	{
+		ball->initOptions();
+	}
+	else
+	{
+		delete ball;
+	}
+
+	return ball;
+}
+
+void Ball::initOptions()
+{
+	Size visible_size = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto *title = Label::createWithSystemFont("MAIN MENU", "Arial", 48);
-	title->setColor(Color3B::BLACK);
-	auto menuTitle = MenuItemLabel::create(title);
+	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
+	this->setTag(0);
 
-	auto menuItem1 = MenuItemImage::create(PLAY_BUTTON, PLAY_BUTTON, CC_CALLBACK_1(MenuScene::goToMainScene, this));
-	auto menuItem2 = MenuItemImage::create(EXIT_BUTTON, EXIT_BUTTON, CC_CALLBACK_1(MenuScene::Exit, this));
-
-	auto menu = Menu::create(menuTitle, menuItem1, menuItem2, NULL);
-	menu->alignItemsVerticallyWithPadding(visibleSize.height / 9);
-	this->addChild(menu);
+	auto ball_body = PhysicsBody::createBox(this->getContentSize());
+	ball_body->setDynamic(true);
+	this->setPhysicsBody(ball_body);
 }
-
-void MenuScene::goToMainScene(Ref *pSender)
-{
-	auto scene = MainScene::createScene();
-
-	Director::getInstance()->replaceScene(TransitionFadeTR::create(1.0, scene));
-}
-
-void MenuScene::Exit(Ref *pSender)
-{
-	exit(0);
-}
-
-

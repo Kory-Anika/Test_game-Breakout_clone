@@ -26,6 +26,7 @@ Scene* MainScene::createScene()
 {
 	auto scene = Scene::createWithPhysics();
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	scene->getPhysicsWorld()->setGravity(Vect(0, 0));
 
 	auto layer = MainScene::create();
 	layer->SetWorld(scene->getPhysicsWorld());

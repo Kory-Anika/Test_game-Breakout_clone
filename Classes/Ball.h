@@ -1,22 +1,21 @@
-#ifndef __MENUSCENE_H__
-#define __MENUSCENE_H__
+#ifndef __BALL_H__
+#define __BALL_H__
 
 #include "cocos2d.h"
 
 USING_NS_CC;
+using namespace cocos2d;
 
-class MenuScene : public cocos2d::Scene
+class Ball : public Sprite
 {
 public:
-    static cocos2d::Scene* createScene();
+	Ball();
+	virtual ~Ball();
 
-    virtual bool init();
-    
-    CREATE_FUNC(MenuScene);
+	static Ball* create();
+	void initOptions();
 
-	void MenuManager();
-	void goToMainScene(Ref *pSender);
-	void Exit(Ref *pSender);
+private:
 };
 
-#endif // __MENUSCENE_H__
+#endif // __BALL_H__
