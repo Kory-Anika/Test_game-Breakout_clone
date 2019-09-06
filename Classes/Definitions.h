@@ -8,4 +8,6 @@
 
 #define BALL ("MySprites/ball.png")
 
+#define BLOCK ("CloseNormal.png")
+ 
 #define RECT0 ("MySprites/rect0.png")

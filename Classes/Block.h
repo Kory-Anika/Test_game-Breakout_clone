@@ -1,22 +1,20 @@
-#ifndef __MENUSCENE_H__
-#define __MENUSCENE_H__
+#ifndef __BLOCK_H__
+#define __BLOCK_H__
 
 #include "cocos2d.h"
 
 USING_NS_CC;
+using namespace cocos2d;
 
-class MenuScene : public cocos2d::Scene
+class Block
 {
 public:
-    static cocos2d::Scene* createScene();
+	Block();
+	void Block_Spawn(Layer *layer);
 
-    virtual bool init();
-    
-    CREATE_FUNC(MenuScene);
-
-	void MenuManager();
-	void goToMainScene(Ref *pSender);
-	void Exit(Ref *pSender);
+private:
+	Sprite *block;
+	Vector<Sprite*> blocks;
 };
 
-#endif // __MENUSCENE_H__
+#endif // __BLOCK_H__
