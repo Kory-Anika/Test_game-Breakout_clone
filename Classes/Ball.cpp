@@ -37,9 +37,14 @@ void Ball::initOptions()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
-	this->setTag(0);
+	this->setScale(0.2f);
+	this->setTag(1);
 
-	auto ball_body = PhysicsBody::createBox(this->getContentSize());
+	auto ball_body = PhysicsBody::createCircle(this->getContentSize().width / 2, PhysicsMaterial(1.0f, 0.0f, 1.0f));
 	ball_body->setDynamic(true);
+	
+	Vec2 force = Vec2(100, 100);
+	ball_body->applyImpulse(force, ball_body->getPositionOffset());
+	
 	this->setPhysicsBody(ball_body);
 }

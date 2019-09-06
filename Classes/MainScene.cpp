@@ -7,8 +7,11 @@
 
 USING_NS_CC;
 
+using namespace cocos2d;
+
 int s = 200;
 int count = 0;
+int x_movement = 0;
 
 ccColor3B red = ccColor3B(255, 0, 0);
 ccColor3B green = ccColor3B(0, 255, 0);
@@ -25,7 +28,7 @@ ccColor3B MyColors[] = {
 Scene* MainScene::createScene()
 {
 	auto scene = Scene::createWithPhysics();
-	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	scene->getPhysicsWorld()->setGravity(Vect(0, 0));
 
 	auto layer = MainScene::create();
@@ -38,51 +41,51 @@ Scene* MainScene::createScene()
 
 bool MainScene::init()
 {
-    if (!Scene::init())
+    if (!Layer::init())
     {
         return false;
     }
 
-	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Size visible_size = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	game_layer = Layer::create();
 
 	auto bg = cocos2d::LayerColor::create(Color4B(255, 255, 255, 255));
 	this->addChild(bg);
 
-	auto edgebody = PhysicsBody::createEdgeBox(visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3);
-
-	auto edgenode = Node::create();
-	edgenode->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-	edgenode->setPhysicsBody(edgebody);
-	this->addChild(edgenode);
+	//edge_node
+	{
+		auto edgebody = PhysicsBody::createEdgeBox(visible_size, PHYSICSBODY_MATERIAL_DEFAULT, 3);
+		auto edgenode = Node::create();
+		edgenode->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
+		edgenode->setPhysicsBody(edgebody);
+		this->addChild(edgenode); 
+	}
 
 	// ball sprite
-	{
-		auto ball = Sprite::create(BALL);
-		ball->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 200));
-		ball->setScale(0.2);
-		ball->setTag(1);
+	ball = Ball::create();
+	game_layer->addChild(ball);
 
-		auto ballbody = PhysicsBody::createCircle(ball->getContentSize().width / 2, PhysicsMaterial(0, 1.03, 0));
-		
-		ballbody->addMoment(20);
-		ballbody->setCollisionBitmask(1);
-		ballbody->setContactTestBitmask(true);
-		//ballbody->setVelocity(Vect(s, s));
-		ballbody->applyForce(Vect(400, 400));
-		ballbody->applyImpulse(Vect(600, 600));
-
-		ball->setPhysicsBody(ballbody);
-		this->addChild(ball);
-
-		auto action = MoveBy::create(500, Vec2(s, s));
-		ball->runAction(action);
-	}
+	//{
+	//	auto ballbody = PhysicsBody::createCircle(ball->getContentSize().width / 2, PhysicsMaterial(0, 1.03, 0));
+	//	
+	//	ballbody->addMoment(20);
+	//	ballbody->setCollisionBitmask(1);
+	//	ballbody->setContactTestBitmask(true);
+	//	//ballbody->setVelocity(Vect(s, s));
+	//	ballbody->applyForce(Vect(400, 400));
+	//	ballbody->applyImpulse(Vect(600, 600));
+	//	ball->setPhysicsBody(ballbody);
+	//	this->addChild(ball);
+	//	auto action = MoveBy::create(500, Vec2(s, s));
+	//	ball->runAction(action);
+	//}
 
 	// rect sprite
 	{
 		auto rect = Sprite::create("CloseNormal.png");
-		rect->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 270));
+		rect->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y - 270));
 		rect->setScaleX(8);
 		rect->setColor(Color3B::BLACK);
 		rect->setTag(2);
@@ -97,30 +100,12 @@ bool MainScene::init()
 		
 		rect->setPhysicsBody(rectbody);
 		this->addChild(rect);
-
-		auto eventListener = EventListenerKeyboard::create();
-		eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event) {
-
-			Vec2 loc = event->getCurrentTarget()->getPosition();
-			switch (keyCode) {
-			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			case EventKeyboard::KeyCode::KEY_A:
-				event->getCurrentTarget()->setPosition(--loc.x - 50, loc.y);
-				break;
-			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			case EventKeyboard::KeyCode::KEY_D:
-				event->getCurrentTarget()->setPosition(++loc.x + 50, loc.y);
-				break;
-			}
-		};
-
-		this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, rect);
 	}
 
 	// rect0 sprite
 	{
 		auto rect0 = Sprite::create(RECT0);
-		rect0->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 330));
+		rect0->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y - 330));
 		rect0->setScaleX(15);
 		rect0->setTag(0);
 
@@ -134,36 +119,77 @@ bool MainScene::init()
 		this->addChild(rect0);
 	}
 
-	auto contactListener = EventListenerPhysicsContact::create();
-	contactListener->onContactBegin = CC_CALLBACK_1(MainScene::onContact, this);
-	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
-
 	// cube array
 	{
 		Cubes(-60, 0);
 		Cubes(-30, 14);
 		Cubes(0, 29);
 		Cubes(30, 44);
-		Cubes(60, 59); 
+		Cubes(60, 59);
 	}
+
+
+	// keyboard listener 
+	{
+		auto keyBoardListener = EventListenerKeyboard::create();
+		keyBoardListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event)
+		{
+			switch (keyCode)
+			{
+			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			case EventKeyboard::KeyCode::KEY_A:
+				x_movement--;
+				break;
+			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+			case EventKeyboard::KeyCode::KEY_D:
+				x_movement++;
+				break;
+			}
+		};
+		keyBoardListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
+		{
+			switch (keyCode)
+			{
+			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			case EventKeyboard::KeyCode::KEY_A:
+				x_movement++;
+				break;
+			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+			case EventKeyboard::KeyCode::KEY_D:
+				x_movement--;
+				break;
+			}
+		};
+		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(keyBoardListener, this);
+	}
+
+	// contact listener
+	{
+		auto contactListener = EventListenerPhysicsContact::create();
+		contactListener->onContactBegin = CC_CALLBACK_1(MainScene::onContactBegin, this);
+		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
+	}
+
+
+	this->addChild(game_layer);
 
 	UserDefault *def = UserDefault::getInstance();
 
-	//score
+	//score label
 	{
 		score = 0;
-		__String *tempscore = __String::createWithFormat("%i", score);
+		__String *temp_score = __String::createWithFormat("%i", score);
 
-		scoreLabel = Label::createWithSystemFont(tempscore->getCString(), "Arial", 30);
-		scoreLabel->setColor(Color3B::BLACK);
-		scoreLabel->setPosition(Point(visibleSize.width / 10 + origin.x, visibleSize.height / 2 + 305));
-		this->addChild(scoreLabel, 1000);
+		score_label = Label::createWithSystemFont(temp_score->getCString(), "Arial", 30);
+		score_label->setColor(Color3B::BLACK);
+		score_label->setPosition(Point(visible_size.width / 10 + origin.x, visible_size.height / 2 + 305));
+		this->addChild(score_label, 10);
 	}
 
     return true;
 }
 
-bool MainScene::onContact(cocos2d::PhysicsContact &contact)
+bool MainScene::onContactBegin(cocos2d::PhysicsContact &contact)
 {
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
@@ -189,7 +215,7 @@ bool MainScene::onContact(cocos2d::PhysicsContact &contact)
 
 				score = score + 10;
 				__String *tempscore = __String::createWithFormat("%i", score);
-				scoreLabel->setString(tempscore->getCString());
+				score_label->setString(tempscore->getCString());
 			}
 
 			count = count + 1;
@@ -216,7 +242,7 @@ bool MainScene::onContact(cocos2d::PhysicsContact &contact)
 
 				score = score + 10;
 				__String *tempscore = __String::createWithFormat("%i", score);
-				scoreLabel->setString(tempscore->getCString());
+				score_label->setString(tempscore->getCString());
 			}
 
 			count = count + 1;
@@ -275,7 +301,7 @@ void MainScene::Cubes(int f, int t)
 	}
 }
 
-void MainScene::Update(float dt)
+void MainScene::update(float dt)
 {
 	for (int i = 0; i < cubes.size(); i++)
 	{
@@ -283,4 +309,7 @@ void MainScene::Update(float dt)
 
 		cube->setPositionX(cube->getPositionX() - dt * 10);
 	}
+
+	float new_pos_x = paddle->getPositionX() + (x_movement * MOVEMENT_SPEED);
+	paddle->setPositionX(new_pos_x);
 }

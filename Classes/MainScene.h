@@ -2,30 +2,34 @@
 #define __MAINSCENE_H__
 
 #include "cocos2d.h"
+#include "Ball.h"
 
 using namespace cocos2d;
 
-class MainScene : public cocos2d::Scene
+class MainScene : public Layer
 {
 public:
-	static cocos2d::Scene* createScene();
+	static Scene* createScene();
 
 	virtual bool init();
 
 	CREATE_FUNC(MainScene);
 
-	unsigned int score;
-	cocos2d::Label *scoreLabel;
-
 private:
-	cocos2d::PhysicsWorld *SceneWorld;
-	void SetWorld(cocos2d::PhysicsWorld *MyWorld) { SceneWorld = MyWorld; }
-	bool onContact(cocos2d::PhysicsContact &contact);
+	PhysicsWorld *SceneWorld;
+	void SetWorld(PhysicsWorld *MyWorld) { SceneWorld = MyWorld; };
+
+	Layer *game_layer;
+	Ball *ball;
 
 	std::vector<Sprite*> cubes;
-	void Cubes(int f, int t);
 
-	void Update(float dt);
+	unsigned int score;
+	Label *score_label;
+
+	bool onContactBegin(PhysicsContact &contact);
+	void Cubes(int f, int t);
+	void update(float dt);
 };
 
 #endif // __MAINSCENE_H__
