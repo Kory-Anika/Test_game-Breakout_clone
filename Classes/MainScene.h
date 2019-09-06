@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Ball.h"
+#include "Paddle.h"
 
 using namespace cocos2d;
 
@@ -21,6 +22,7 @@ private:
 
 	Layer *game_layer;
 	Ball *ball;
+	Paddle *paddle;
 
 	std::vector<Sprite*> cubes;
 

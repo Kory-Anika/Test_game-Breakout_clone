@@ -36,7 +36,7 @@ void Ball::initOptions()
 	Size visible_size = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
+	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 4 + origin.y));
 	this->setScale(0.2f);
 	this->setTag(1);
 

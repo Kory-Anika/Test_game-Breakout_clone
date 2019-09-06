@@ -67,40 +67,8 @@ bool MainScene::init()
 	ball = Ball::create();
 	game_layer->addChild(ball);
 
-	//{
-	//	auto ballbody = PhysicsBody::createCircle(ball->getContentSize().width / 2, PhysicsMaterial(0, 1.03, 0));
-	//	
-	//	ballbody->addMoment(20);
-	//	ballbody->setCollisionBitmask(1);
-	//	ballbody->setContactTestBitmask(true);
-	//	//ballbody->setVelocity(Vect(s, s));
-	//	ballbody->applyForce(Vect(400, 400));
-	//	ballbody->applyImpulse(Vect(600, 600));
-	//	ball->setPhysicsBody(ballbody);
-	//	this->addChild(ball);
-	//	auto action = MoveBy::create(500, Vec2(s, s));
-	//	ball->runAction(action);
-	//}
-
-	// rect sprite
-	{
-		auto rect = Sprite::create("CloseNormal.png");
-		rect->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y - 270));
-		rect->setScaleX(8);
-		rect->setColor(Color3B::BLACK);
-		rect->setTag(2);
-
-		auto rectbody = PhysicsBody::createBox(rect->getContentSize(), PhysicsMaterial(0, 1, 0));
-		
-		rectbody->setCollisionBitmask(2);
-		rectbody->setContactTestBitmask(true);
-		rectbody->setDynamic(false);
-		rectbody->addMoment(10);
-		rectbody->applyImpulse(Vect(200, 200));
-		
-		rect->setPhysicsBody(rectbody);
-		this->addChild(rect);
-	}
+	paddle = Paddle::create();
+	game_layer->addChild(paddle);
 
 	// rect0 sprite
 	{
@@ -127,7 +95,6 @@ bool MainScene::init()
 		Cubes(30, 44);
 		Cubes(60, 59);
 	}
-
 
 	// keyboard listener 
 	{
@@ -174,6 +141,8 @@ bool MainScene::init()
 	this->addChild(game_layer);
 
 	UserDefault *def = UserDefault::getInstance();
+
+	this->scheduleUpdate();
 
 	//score label
 	{
@@ -303,12 +272,12 @@ void MainScene::Cubes(int f, int t)
 
 void MainScene::update(float dt)
 {
-	for (int i = 0; i < cubes.size(); i++)
-	{
-		auto cube = cubes.at(i);
+	//for (int i = 0; i < cubes.size(); i++)
+	//{
+	//	auto cube = cubes.at(i);
 
-		cube->setPositionX(cube->getPositionX() - dt * 10);
-	}
+	//	cube->setPositionX(cube->getPositionX() - dt * 10);
+	//}
 
 	float new_pos_x = paddle->getPositionX() + (x_movement * MOVEMENT_SPEED);
 	paddle->setPositionX(new_pos_x);

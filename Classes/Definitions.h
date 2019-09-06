@@ -6,6 +6,7 @@
 
 #define BALL ("MySprites/ball.png")
 #define BLOCK ("CloseNormal.png")
+#define PADDLE ("CloseNormal.png")
 #define RECT0 ("MySprites/rect0.png")
 
-#define MOVEMENT_SPEED 3.0f
+#define MOVEMENT_SPEED 6.0f
