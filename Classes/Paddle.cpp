@@ -36,15 +36,14 @@ void Paddle::initOptions()
 	Size visible_size = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
-	this->setScale(0.2f);
-	this->setTag(1);
+	this->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 4 + origin.y));
+	this->setScaleX(8);
+	this->setColor(Color3B::BLACK);
+	this->setTag(2);
 
-	auto paddle_body = PhysicsBody::createCircle(this->getContentSize().width / 2, PhysicsMaterial(1.0f, 0.0f, 1.0f));
-	paddle_body->setDynamic(true);
-	
-	Vec2 force = Vec2(100, 100);
-	paddle_body->applyImpulse(force, paddle_body->getPositionOffset());
+	auto paddle_body = PhysicsBody::createBox(this->getContentSize(), PhysicsMaterial(1.0f, 0.0f, 1.0f));
+	paddle_body->setDynamic(false);
+	paddle_body->setContactTestBitmask(true);
 	
 	this->setPhysicsBody(paddle_body);
 }
