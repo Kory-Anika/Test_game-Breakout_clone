@@ -10,11 +10,14 @@ class Block
 {
 public:
 	Block();
-	void Block_Spawn(Layer *layer);
+	void Block_Spawn(Layer *layer, int f, int i, Color3B color);
 
 private:
 	Sprite *block;
 	Vector<Sprite*> blocks;
+
+	Size visible_size;
+	Vec2 origin;
 };
 
 #endif // __BLOCK_H__
