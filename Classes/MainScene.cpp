@@ -9,26 +9,24 @@ USING_NS_CC;
 
 using namespace cocos2d;
 
-int s = 200;
-int count = 0;
 int x_movement = 0;
+int speed = 400;
 
-ccColor3B red = ccColor3B(255, 0, 0);
-ccColor3B green = ccColor3B(0, 255, 0);
-ccColor3B blue = ccColor3B(0, 0, 255);
+Color3B red = Color3B(255, 0, 0);
+Color3B green = Color3B(0, 255, 0);
+Color3B blue = Color3B(0, 0, 255);
 
-ccColor3B MyColor;
-
-ccColor3B MyColors[] = {
-	{ red },
-	{ green },
-	{ blue }
+Color3B MyColor;
+Color3B MyColors[] = {
+	{red},
+	{green},
+	{blue}
 };
 
 Scene* MainScene::createScene()
 {
 	auto scene = Scene::createWithPhysics();
-	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	scene->getPhysicsWorld()->setGravity(Vect(0, 0));
 
 	auto layer = MainScene::create();
@@ -56,14 +54,17 @@ bool MainScene::init()
 
 	//edge_node
 	{
-		auto edgebody = PhysicsBody::createEdgeBox(visible_size, PHYSICSBODY_MATERIAL_DEFAULT, 3);
 		auto edgenode = Node::create();
 		edgenode->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y));
-		edgenode->setPhysicsBody(edgebody);
+		edgenode->setTag(0);
+
+		auto edge_body = PhysicsBody::createEdgeBox(visible_size, PhysicsMaterial(1.0f, 0.5f, 0.5f), 3);
+		edge_body->setDynamic(false);
+		edgenode->setPhysicsBody(edge_body);
+		
 		this->addChild(edgenode); 
 	}
 
-	// ball sprite
 	ball = Ball::create();
 	game_layer->addChild(ball);
 
@@ -75,25 +76,24 @@ bool MainScene::init()
 		auto rect0 = Sprite::create(RECT0);
 		rect0->setPosition(Point(visible_size.width / 2 + origin.x, visible_size.height / 2 + origin.y - 330));
 		rect0->setScaleX(15);
-		rect0->setTag(0);
+		rect0->setTag(3);
 
-		auto rect0body = PhysicsBody::createBox(rect0->getContentSize(), PhysicsMaterial(0, 1, 0));
+		auto rect0_body = PhysicsBody::createBox(rect0->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+		rect0_body->setDynamic(false);
+		rect0_body->setCollisionBitmask(0);
+		rect0_body->setContactTestBitmask(true);
+		rect0->setPhysicsBody(rect0_body);
 
-		rect0body->setCollisionBitmask(0);
-		rect0body->setContactTestBitmask(true);
-		rect0body->setDynamic(false);
-
-		rect0->setPhysicsBody(rect0body);
 		this->addChild(rect0);
 	}
 
-	// cube array
+	// blocks
 	{
-		Cubes(-60, 0);
-		Cubes(-30, 14);
-		Cubes(0, 29);
-		Cubes(30, 44);
-		Cubes(60, 59);
+		Blocks(-60);
+		Blocks(-30);
+		Blocks(0);
+		Blocks(30);
+		Blocks(60);
 	}
 
 	// keyboard listener 
@@ -137,12 +137,12 @@ bool MainScene::init()
 		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
 	}
 
-
 	this->addChild(game_layer);
 
 	UserDefault *def = UserDefault::getInstance();
 
 	this->scheduleUpdate();
+	this->schedule(schedule_selector(MainScene::update_speed), 0.009 * visible_size.width);
 
 	//score label
 	{
@@ -165,7 +165,7 @@ bool MainScene::onContactBegin(cocos2d::PhysicsContact &contact)
 
 	if (nodeA && nodeB)
 	{
-		if (nodeA->getTag() == 1 && nodeB->getTag() != 2 && nodeB->getTag() != 0)
+		if (nodeA->getTag() == 1 && nodeB->getTag() != 0 && nodeB->getTag() != 2 && nodeB->getTag() != 3)
 		{
 			
 			if (nodeB->getColor() == blue)
@@ -182,18 +182,12 @@ bool MainScene::onContactBegin(cocos2d::PhysicsContact &contact)
 			{
 				nodeB->removeFromParentAndCleanup(true);
 
-				score = score + 10;
+				score += 10;
 				__String *tempscore = __String::createWithFormat("%i", score);
 				score_label->setString(tempscore->getCString());
 			}
-
-			count = count + 1;
-			if (count % 5 == 0)
-			{
-				s = s + s * 0.1;
-			}
 		}
-		else if (nodeB->getTag() == 1 && nodeA->getTag() != 2 && nodeA->getTag() != 0)
+		else if (nodeB->getTag() == 1 && nodeA->getTag() != 0 && nodeA->getTag() != 2 && nodeA->getTag() != 3)
 		{
 			if (nodeA->getColor() == blue)
 			{
@@ -209,27 +203,25 @@ bool MainScene::onContactBegin(cocos2d::PhysicsContact &contact)
 			{
 				nodeA->removeFromParentAndCleanup(true);
 
-				score = score + 10;
+				score += 10;
 				__String *tempscore = __String::createWithFormat("%i", score);
 				score_label->setString(tempscore->getCString());
-			}
-
-			count = count + 1;
-			if (count % 5 == 0)
-			{
-				s = s + s * 0.1;
 			}
 		}
 	}
 
-	PhysicsBody *c = contact.getShapeA()->getBody();
-	PhysicsBody *d = contact.getShapeB()->getBody();
+	auto nodeC = contact.getShapeA()->getBody()->getNode();
+	auto nodeD = contact.getShapeB()->getBody()->getNode();
 
-	if ((1 == c->getCollisionBitmask() && 0 == d->getCollisionBitmask()) || (0 == c->getCollisionBitmask() && 1 == d->getCollisionBitmask()))
+	if (nodeC && nodeD)
 	{
-		auto scene = GameOver::createScene(score);
-		Director::getInstance()->replaceScene(scene);
-		cleanup();
+		if ((nodeC->getTag() == 1 && nodeD->getTag() == 3 && nodeD->getTag() != 0 && nodeD->getTag() != 2)
+			|| (nodeD->getTag() == 1 && nodeC->getTag() == 3 && nodeC->getTag() != 0 && nodeD->getTag() != 2))
+		{
+			auto scene = GameOver::createScene(score);
+			Director::getInstance()->replaceScene(scene);
+			cleanup();
+		}
 	}
 
 	if (score == 750)
@@ -242,43 +234,27 @@ bool MainScene::onContactBegin(cocos2d::PhysicsContact &contact)
 	return true;
 }
 
-void MainScene::Cubes(int f, int t) 
+void MainScene::Blocks(int f)
 {
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
 	for (int i = 0; i < 15; i++)
 	{
-		ccColor3B MyColor = MyColors[cocos2d::random(0, 2)];
+		Color3B MyColor = MyColors[cocos2d::random(0, 2)];
 
-		auto cube = Sprite::create("CloseNormal.png");
-		cube->setPosition(Vec2(visibleSize.width / 28 + i * 32, visibleSize.height / 1.2 + f));
-		cube->setScale(0.87);
-		cube->setColor(MyColor);
-		cube->setTag(t + 3);
-
-		auto cubebody = PhysicsBody::createBox(cube->getContentSize(), PhysicsMaterial(0, 1, 0));
-
-		cubebody->setCollisionBitmask(t + 3);
-		cubebody->setContactTestBitmask(true);
-		cubebody->setDynamic(false);
-
-		cube->setPhysicsBody(cubebody);
-
-		this->addChild(cube, i);
-		cubes.push_back(cube);
+		block.Block_Spawn(this, f, i, MyColor);
 	}
 }
 
 void MainScene::update(float dt)
 {
-	//for (int i = 0; i < cubes.size(); i++)
-	//{
-	//	auto cube = cubes.at(i);
-
-	//	cube->setPositionX(cube->getPositionX() - dt * 10);
-	//}
-
 	float new_pos_x = paddle->getPositionX() + (x_movement * MOVEMENT_SPEED);
 	paddle->setPositionX(new_pos_x);
+
+	auto body = ball->getPhysicsBody();
+	body->setVelocity(body->getVelocity().getNormalized() * speed);
+}
+
+void MainScene::update_speed(float dt)
+{
+	speed += 5;
+	CCLOG("speed: %i", speed);
 }

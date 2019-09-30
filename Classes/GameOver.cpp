@@ -63,6 +63,7 @@ void GameOver::goToMainScene(Ref *pSender)
 {
 	auto scene = MainScene::createScene();
 	Director::getInstance()->replaceScene(TransitionFadeTR::create(1.0, scene));
+	cleanup();
 }
 
 void GameOver::Exit(Ref *pSender)

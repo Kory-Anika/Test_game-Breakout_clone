@@ -9,4 +9,4 @@
 #define PADDLE ("CloseNormal.png")
 #define RECT0 ("MySprites/rect0.png")
 
-#define MOVEMENT_SPEED 6.0f
+#define MOVEMENT_SPEED 7.0f

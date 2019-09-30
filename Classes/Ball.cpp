@@ -40,11 +40,13 @@ void Ball::initOptions()
 	this->setScale(0.2f);
 	this->setTag(1);
 
-	auto ball_body = PhysicsBody::createCircle(this->getContentSize().width / 2, PhysicsMaterial(1.0f, 0.0f, 1.0f));
+	auto ball_body = PhysicsBody::createCircle(this->getContentSize().width / 2, PhysicsMaterial(1.0f, 1.0f, 0.0f));
 	ball_body->setDynamic(true);
-	
-	Vec2 force = Vec2(100, 100);
-	ball_body->applyImpulse(force, ball_body->getPositionOffset());
-	
+	ball_body->setCollisionBitmask(1);
+	ball_body->setContactTestBitmask(true);
+
+	ball_body->setVelocity(Vec2(300, 300));
+	ball_body->applyImpulse(Vec2(600, 600));
+
 	this->setPhysicsBody(ball_body);
 }

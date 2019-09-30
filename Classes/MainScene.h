@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Ball.h"
 #include "Paddle.h"
+#include "Block.h"
 
 using namespace cocos2d;
 
@@ -23,6 +24,7 @@ private:
 	Layer *game_layer;
 	Ball *ball;
 	Paddle *paddle;
+	Block block;
 
 	std::vector<Sprite*> cubes;
 
@@ -30,8 +32,9 @@ private:
 	Label *score_label;
 
 	bool onContactBegin(PhysicsContact &contact);
-	void Cubes(int f, int t);
+	void Blocks(int f);
 	void update(float dt);
+	void update_speed(float dt);
 };
 
 #endif // __MAINSCENE_H__
