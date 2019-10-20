@@ -9,13 +9,11 @@ using namespace cocos2d;
 class Paddle : public Sprite
 {
 public:
-	Paddle();
-	virtual ~Paddle();
+	Paddle() {};
+	virtual ~Paddle() {};
 
 	static Paddle* create();
 	void initOptions();
-
-private:
 };
 
 #endif // __PADDLE_H__

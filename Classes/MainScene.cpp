@@ -9,8 +9,7 @@ USING_NS_CC;
 
 using namespace cocos2d;
 
-int x_movement = 0;
-int speed = 400;
+int x_movement = 0, speed = 400;
 
 Color3B red = Color3B(255, 0, 0);
 Color3B green = Color3B(0, 255, 0);
@@ -239,7 +238,6 @@ void MainScene::Blocks(int f)
 	for (int i = 0; i < 15; i++)
 	{
 		Color3B MyColor = MyColors[cocos2d::random(0, 2)];
-
 		block.Block_Spawn(this, f, i, MyColor);
 	}
 }
@@ -256,5 +254,5 @@ void MainScene::update(float dt)
 void MainScene::update_speed(float dt)
 {
 	speed += 5;
-	CCLOG("speed: %i", speed);
+	//CCLOG("speed: %i", speed);
 }

@@ -9,13 +9,11 @@ using namespace cocos2d;
 class Ball : public Sprite
 {
 public:
-	Ball();
-	virtual ~Ball();
+	Ball() {};
+	virtual ~Ball() {};
 
 	static Ball* create();
 	void initOptions();
-
-private:
 };
 
 #endif // __BALL_H__

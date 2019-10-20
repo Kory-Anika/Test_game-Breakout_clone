@@ -4,16 +4,6 @@
 USING_NS_CC;
 using namespace cocos2d;
 
-Ball::Ball()
-{
-
-}
-
-Ball::~Ball()
-{
-
-}
-
 Ball * Ball::create()
 {
 	Ball* ball = NULL;

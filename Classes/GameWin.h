@@ -12,7 +12,7 @@ public:
     
     CREATE_FUNC(GameWin);
 
-	void MenuManager2();
+	void MenuManager();
 	void goToMainScene(Ref *pSender);
 	void Exit(Ref *pSender);
 };
