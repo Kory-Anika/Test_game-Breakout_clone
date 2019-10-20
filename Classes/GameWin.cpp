@@ -33,17 +33,17 @@ bool GameWin::init()
 
 	std::string str = StringUtils::format("SCORE: %d", h2);
 
-	auto highscore2 = cocos2d::Label::createWithSystemFont(str, "Arial", 32);
-	highscore2->setPosition(Point(visibleSize2.width / 10 + 100, visibleSize2.height / 2 + 600));
-	highscore2->setColor(Color3B::BLACK);
-	this->addChild(highscore2);
+	auto highscore = cocos2d::Label::createWithSystemFont(str, "Arial", 32);
+	highscore->setPosition(Point(visibleSize2.width / 10 + 100, visibleSize2.height / 2 + 600));
+	highscore->setColor(Color3B::BLACK);
+	this->addChild(highscore);
 
-	MenuManager2();
+	MenuManager();
 
     return true;
 }
 
-void GameWin::MenuManager2()
+void GameWin::MenuManager()
 {
 	auto *title = Label::createWithSystemFont("YOU WON!", "Arial", 48);
 	title->setColor(Color3B::BLACK);
@@ -63,6 +63,7 @@ void GameWin::goToMainScene(Ref *pSender)
 {
 	auto scene = MainScene::createScene();
 	Director::getInstance()->replaceScene(TransitionFadeTR::create(1.0, scene));
+	cleanup();
 }
 
 void GameWin::Exit(Ref *pSender)

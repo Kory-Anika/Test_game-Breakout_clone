@@ -4,15 +4,10 @@
 USING_NS_CC;
 using namespace cocos2d;
 
-Block::Block()
-{
-
-}
-
 void Block::Block_Spawn(Layer * layer, int f, int i, Color3B color)
 {
-	visible_size = Director::getInstance()->getVisibleSize();
-	origin = Director::getInstance()->getVisibleOrigin();
+	Size visible_size = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	block = Sprite::create(BLOCK);
 	block->setPosition(Vec2(visible_size.width / 28 + i * 32, visible_size.height / 1.2 + f));

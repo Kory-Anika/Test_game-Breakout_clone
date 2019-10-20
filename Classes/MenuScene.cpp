@@ -55,13 +55,11 @@ void MenuScene::MenuManager()
 void MenuScene::goToMainScene(Ref *pSender)
 {
 	auto scene = MainScene::createScene();
-
 	Director::getInstance()->replaceScene(TransitionFadeTR::create(1.0, scene));
+	cleanup();
 }
 
 void MenuScene::Exit(Ref *pSender)
 {
 	exit(0);
 }
-
-

@@ -70,4 +70,3 @@ void GameOver::Exit(Ref *pSender)
 {
 	exit(0);
 }
-

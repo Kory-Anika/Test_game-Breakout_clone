@@ -4,16 +4,6 @@
 USING_NS_CC;
 using namespace cocos2d;
 
-Paddle::Paddle()
-{
-
-}
-
-Paddle::~Paddle()
-{
-
-}
-
 Paddle * Paddle::create()
 {
 	Paddle* paddle = NULL;
