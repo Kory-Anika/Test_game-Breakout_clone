@@ -1,2 +1,2 @@
 # MyGame
-A copy of Arcanoid, made with Cocos2d-x
+A clone of famous Breakout game, made with Cocos2d-x
